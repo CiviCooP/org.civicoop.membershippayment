@@ -9,6 +9,11 @@ function membershippayment_civicrm_buildForm($formName, &$form) {
   }
 }
 
+function membershippayment_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  $contribution = CRM_Membershippayment_Contribution_Form::singleton();
+  $contribution->post($op, $objectName, $objectId, $objectRef);
+}
+
 /**
  *
  * Implementation of hook_civicrm_postProcess

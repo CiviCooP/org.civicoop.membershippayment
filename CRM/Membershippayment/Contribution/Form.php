@@ -4,8 +4,16 @@ class CRM_Membershippayment_Contribution_Form {
 
   private static $singleton;
 
+  private $created_contribution_id;
+
   private function __construct() {
 
+  }
+
+  public function post($op, $objectName, $objectId, &$objectRef) {
+    if ($op == 'create' && $objectName == 'Contribution') {
+      $this->created_contribution_id = $objectId;
+    }
   }
 
   public function postProcess($formName, &$form) {
@@ -18,6 +26,10 @@ class CRM_Membershippayment_Contribution_Form {
 
     $membership_payment_id = false;
     $contribution_id = $form->getVar('_id');
+    if (!$contribution_id && $this->created_contribution_id) {
+      $contribution_id = $this->created_contribution_id;
+    }
+    
     if ($contribution_id) {
       $membership_payment_id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_membership_payment where contribution_id = %1", array(1 => array($contribution_id, 'Integer')));
     }

@@ -70,14 +70,22 @@ class CRM_Membershippayment_Contribution_Form {
       return;
     }
 
+    $memberships = array('' => ts('-- None --')) + $this->getMembershipsForContact($contact_id);
+
     $current_membership_id = false;
     $contribution_id = $form->getVar('_id');
+    $contact_ids[] = $contact_id;
     if ($contribution_id) {
       $current_membership_id = CRM_Core_DAO::singleValueQuery("SELECT membership_id FROM civicrm_membership_payment where contribution_id = %1", array(1 => array($contribution_id, 'Integer')));
+
+      $softContribution = civicrm_api3('ContributionSoft', 'get', array('contribution_id' => $contribution_id));
+      foreach($softContribution['values'] as $softContribution) {
+        if (!in_array($softContribution['contact_id'], $contact_ids)) {
+          $memberships = $memberships + $this->getMembershipsForContact($softContribution['contact_id']);
+          $contact_ids[] = $softContribution['contact_id'];
+        }
+      }
     }
-
-
-    $memberships = array('' => ts('-- None --')) + $this->getMembershipsForContact($contact_id);
 
     $snippet['template'] = 'CRM/Membershippayment/Contribution/Form.tpl';
     $snippet['contact_id'] = $contact_id;
@@ -102,10 +110,11 @@ class CRM_Membershippayment_Contribution_Form {
 
     $dao->find(false);
     $memberships = array();
+    $display_name = civicrm_api3('Contact', 'getvalue', array('id' => $contact_id, 'return' => 'display_name'));
     while ($dao->fetch()) {
       $startDate = new DateTime($dao->start_date);
       $endDate = new DateTime($dao->end_date);
-      $memberships[$dao->id] = CRM_Member_PseudoConstant::membershipType($dao->membership_type_id) . ': '.CRM_Member_PseudoConstant::membershipStatus($dao->status_id, null, 'label').' ('.$startDate->format('d-m-Y').' - '.$endDate->format('d-m-Y').')';
+      $memberships[$dao->id] = $display_name." - ".CRM_Member_PseudoConstant::membershipType($dao->membership_type_id) . ': '.CRM_Member_PseudoConstant::membershipStatus($dao->status_id, null, 'label').' ('.$startDate->format('d-m-Y').' - '.$endDate->format('d-m-Y').')';
     }
     return $memberships;
   }

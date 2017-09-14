@@ -1,0 +1,12 @@
+{
+  "name": "civicoop/org.civicoop.membershippayment",
+  "description": "Link contribution to memberships from the UI",
+  "type": "civicrm-module",
+  "authors": [
+    {
+      "name": "Jaap Jansma",
+      "email": "helpdesk@civicoop.org"
+    }
+  ],
+  "license": "AGPL-3.0"
+}

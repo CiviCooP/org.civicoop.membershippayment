@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="org.civicoop.membershippayment" type="module">
   <file>membershippayment</file>
-  <name>Membership payemnt</name>
+  <name>Membership payment</name>
   <description>Link contribution to memberships from the UI</description>
   <license>AGPL-3.0</license>
   <maintainer>
